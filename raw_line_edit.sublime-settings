@@ -11,9 +11,9 @@
     "operate_on_unsaved_buffers": false,
 
 // Custom symbols for…
-// "cr_symbol":"¤"  ,//¤␍↩       …carriage return
-// "lf_symbol":"¬"  ,//¬␤        …line feed
-// "crlf_symbol":null,//null ⏎⮒⌤  …Cr+Lf    uses SC SF if null
+// "cr_symbol" :"¤"  ,//¤␍↩      …carriage return
+// "lf_symbol" :"¬"  ,//¬␤       …line feed
+// "crlf_symbol":null,//null ⏎⮒⌤ …Cr+Lf    uses "CR_symbol""LF_symbol" if null
 
 // Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite, supports only 1 level of nesting
 // can also use custom styles for each symbol:  "css_c"  "css_f"  "css_cf" for carriage return, line feed, Cr+Lf respectively
