@@ -1,5 +1,11 @@
 # RawLineEdit
 
+## Unreleased
+
+-   **NEW**: user-customizable newline symbol values and phantom style
+-   **NEW**: Updates for Python 3.14 on ST 4205+.
+-   **FIX**: destruction of the last line without a line ending: #30
+
 ## 2.1.0
 
 -   **NEW**: Updates for Python 3.13 on ST 4201+.
