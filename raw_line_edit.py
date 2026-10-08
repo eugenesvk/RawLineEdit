@@ -24,6 +24,9 @@ except Exception:
 
             return False
 
+_f  = '¬' # ¤␍↩ ¬␤  ¤¬␍␤⏎  ⌤
+_c  = '¤'
+_cf = None # use combo of _c and _f instead of a custom char ''
 CSS = """
 <style>
 span {
@@ -368,6 +371,12 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
 
     def update_phantoms(self, crlf, cr, lf):
         """Update phantoms."""
+        C = sublime.load_settings("raw_line_edit.sublime-settings")
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        span_cr = f'{CSS}<span>{sc }</span>'
+        span_lf = f'{CSS}<span>{sf }</span>'
+        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
             pt = self.view.text_point(line + 1, 0) - 1
@@ -537,6 +546,12 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
 
     def update_phantoms(self, view, crlf, cr, lf):
         """Update phantoms."""
+        C = sublime.load_settings("raw_line_edit.sublime-settings")
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        span_cr = f'{CSS}<span>{sc }</span>'
+        span_lf = f'{CSS}<span>{sf }</span>'
+        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
             pt = view.text_point(line + 1, 0) - 1
@@ -583,6 +598,12 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, style="Unix"):
         """Insert text."""
+        C = sublime.load_settings("raw_line_edit.sublime-settings")
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        span_cr = f'{CSS}<span>{sc }</span>'
+        span_lf = f'{CSS}<span>{sf }</span>'
+        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         for s in reversed(self.view.sel()):
             line_regions = self.view.lines(s)
@@ -650,6 +671,12 @@ class RawLineEditListener(sublime_plugin.EventListener):
 
     def on_post_save(self, view):
         """Convert view back to raw line mode after save."""
+        C = sublime.load_settings("raw_line_edit.sublime-settings")
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        span_cr = f'{CSS}<span>{sc }</span>'
+        span_lf = f'{CSS}<span>{sf }</span>'
+        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         if view.settings().get("RawLineEdit", False) and not view.settings().get('RawLineEditPopup', False):
             file_name = view.file_name()
