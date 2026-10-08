@@ -16,6 +16,7 @@
 // "scf":null,//null ⏎⮒⌤  …Cr+Lf    uses SC SF if null
 
 // Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite
+// can also use custom styles for each symbol:  "css_c"  "css_f"  "css_cf" for carriage return, line feed, Cr+Lf respectively
 // "css": [
 //   {"_T":"span", //_T stores the name of the span → "_T {}", the rest become "key: value;" lines
 //     "display"         	: "inline",
