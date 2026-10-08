@@ -53,23 +53,18 @@ RE_NEW_LINE = re.compile(r'(?:\r\n|(?!\r\n)[\n\r])')
 
 def process_lines(text):
     """Count line ending types and return buffer with only new lines."""
-
     crlf = []
-    lf = []
-    cr = []
+    lf   = []
+    cr   = []
     line = {'value': -1}
 
     def repl(m):
         """Replace."""
-
         line['value'] += 1
         end = m.group(0)
-        if end == '\r\n':
-            crlf.append(line['value'])
-        elif end == '\n':
-            lf.append(line['value'])
-        else:
-            cr.append((line['value']))
+        if   end == '\r\n': crlf.append(line['value'])
+        elif end == '\n'  : lf  .append(line['value'])
+        else              : cr  .append(line['value'])
         return '\n'
 
     text = RE_NEW_LINE.sub(repl, text)
@@ -80,26 +75,26 @@ def process_lines(text):
 def strip_buffer_glyphs(view):
     """Strip all glyphs from buffer to load back into view."""
 
-    line = -1
-    more = True
+    print('strip_buffer_glyphs')
+    more       = True
+    line       = -1
     last_value = -1
-    lines = []
-    mappings = {'crlf': '\r\n', 'cr': '\r', 'lf': '\n'}
+    lines      = []
+    mappings   = {'crlf':'\r\n', 'cr':'\r', 'lf':'\n'}
     while more:
         line += 1
         value = view.text_point(line, 0)
         region = None
-        for line_type in ('crlf', 'cr', 'lf'):
+        for line_type in ('crlf','cr','lf'):
             regions = view.get_regions('rle_line_%d_%s' % (line, line_type))
             if regions:
-                view.erase_regions('rle_line_%d_%s' % (line, line_type))
+                view.erase_regions    ('rle_line_%d_%s' % (line, line_type))
                 region = regions[0]
                 break
         if region is not None:
             view.erase_phantoms('rle_line_%d' % line)
             lines.append(view.substr(view.line(region)) + mappings[line_type])
-        if value == last_value:
-            more = False
+        if value == last_value: more = False
         last_value = value
     return ''.join(lines)
 
@@ -355,7 +350,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
     def enable_buffer_rle(self, edit, file_name=None):
         """Enable the raw line mode on an unsaved buffer."""
 
-        if self.view.is_read_only():
+        if  self.view. is_read_only():
             self.view.set_read_only(False)
         settings = self.view.settings()
         self.view.settings().set("RawLineBuffer", self.view.line_endings())
@@ -367,7 +362,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
         settings.set("RawLineMixed",is_mix)
         if file_name is not None:
             settings.set("RawLineEditFilename", file_name)
-        self.view.set_scratch(True)
+        self.view.set_scratch  (True)
         self.view.set_read_only(True)
         self.update_phantoms(crlf, cr, lf, is_mix)
 
