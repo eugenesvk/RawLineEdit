@@ -395,7 +395,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
     def update_phantoms(self, crlf, cr, lf, is_mixed):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
         css_dict = get_cfg_css()
         css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
         css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
@@ -560,7 +560,7 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
     def update_phantoms(self, view, crlf, cr, lf):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
         css_dict = get_cfg_css()
         css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
         css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
@@ -600,7 +600,7 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, style="Unix"):
         """Insert text."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
         is_mixed = self.view.settings().get("RawLineMixed",False)
         css_dict = get_cfg_css()
         css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
@@ -684,7 +684,7 @@ class RawLineEditListener(sublime_plugin.EventListener):
             view.run_command("raw_lines_edit_replace")
 
             C = sublime.load_settings("raw_line_edit.sublime-settings")
-            sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
+            sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
             css_dict = get_cfg_css()
             css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
             css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
