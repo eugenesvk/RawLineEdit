@@ -15,9 +15,11 @@
 // "sf":"¬"  ,//¬␤        …line feed
 // "scf":null,//null ⏎⮒⌤  …Cr+Lf    uses SC SF if null
 
-// Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite
+// Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite, supports only 1 level of nesting
 // can also use custom styles for each symbol:  "css_c"  "css_f"  "css_cf" for carriage return, line feed, Cr+Lf respectively
-// "css": [
+// and even     custom styles for mixed line-ending files, e.g., to highlight ␍Carriage Returns that Sublime Text silently corrupts on save by normalizing it
+  //  "css_mixed"   "css_c_mixed"   "css_f_mixed"   "css_cf_mixed"  for any line ending, ␍carriage return, ␤line feed, ␍␤Cr+Lf respectively
+// "css": [ // a list of CSS spans with their styles
 //   {"_T":"span", //_T stores the name of the span → "_T {}", the rest become "key: value;" lines
 //     "display"         	: "inline",
 //     "font-size"       	: "0.9rem",
