@@ -379,35 +379,17 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
             else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
-            pt = self.view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            self.view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¤</span><span>¬</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
+            pt = self.view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            self.view.add_phantom('rle_line_%d'      % line,  region , span_cf,sublime.LAYOUT_INLINE)
             self.view.add_regions('rle_line_%d_crlf' % line, [region], '', '', sublime.HIDDEN)
         for line in cr:
-            pt = self.view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            self.view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¤</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
-            self.view.add_regions('rle_line_%d_cr' % line, [region], '', '', sublime.HIDDEN)
+            pt = self.view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            self.view.add_phantom('rle_line_%d'      % line,  region , span_cr,sublime.LAYOUT_INLINE)
+            self.view.add_regions('rle_line_%d_cr'   % line, [region], '', '', sublime.HIDDEN)
         for line in lf:
-            pt = self.view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            self.view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¬</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
-            self.view.add_regions('rle_line_%d_lf' % line, [region], '', '', sublime.HIDDEN)
+            pt = self.view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            self.view.add_phantom('rle_line_%d'      % line,  region , span_lf,sublime.LAYOUT_INLINE)
+            self.view.add_regions('rle_line_%d_lf'   % line, [region], '', '', sublime.HIDDEN)
 
     def run(self, edit):
         """Toggle the raw line mode."""
@@ -554,35 +536,17 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
             else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
-            pt = view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¤</span><span>¬</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
+            pt = view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            view.add_phantom('rle_line_%d'      % line,  region , span_cf,sublime.LAYOUT_INLINE)
             view.add_regions('rle_line_%d_crlf' % line, [region], '', '', sublime.HIDDEN)
         for line in cr:
-            pt = view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¤</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
-            view.add_regions('rle_line_%d_cr' % line, [region], '', '', sublime.HIDDEN)
+            pt = view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            view.add_phantom('rle_line_%d'      % line,  region , span_cr,sublime.LAYOUT_INLINE)
+            view.add_regions('rle_line_%d_cr'   % line, [region], '', '', sublime.HIDDEN)
         for line in lf:
-            pt = view.text_point(line + 1, 0) - 1
-            region = sublime.Region(pt)
-            view.add_phantom(
-                'rle_line_%d' % line,
-                region,
-                '%s<span>¬</span>' % CSS,
-                sublime.LAYOUT_INLINE
-            )
-            view.add_regions('rle_line_%d_lf' % line, [region], '', '', sublime.HIDDEN)
+            pt = view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
+            view.add_phantom('rle_line_%d'      % line,  region , span_lf,sublime.LAYOUT_INLINE)
+            view.add_regions('rle_line_%d_lf'   % line, [region], '', '', sublime.HIDDEN)
 
     def run(self, edit):
         """Popup panel with raw line view."""
@@ -622,21 +586,10 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
 
                         pt = self.view.text_point(row + 1, 0) - 1
                         r = sublime.Region(pt)
-                        if style == "Unix":
-                            temp = '%s<span>¬</span>'
-                            line_type = 'lf'
-                        elif style == "Windows":
-                            temp = '%s<span>¤</span><span>¬</span>'
-                            line_type = 'crlf'
-                        else:
-                            temp = '%s<span>¤</span>'
-                            line_type = 'cr'
-                        self.view.add_phantom(
-                            'rle_line_%d' % row,
-                            r,
-                            temp % CSS,
-                            sublime.LAYOUT_INLINE
-                        )
+                        if   style == "Unix"   : temp = span_lf; line_type = 'lf'
+                        elif style == "Windows": temp = span_cf; line_type = 'crlf'
+                        else                   : temp = span_cr; line_type = 'cr'
+                        self.view.add_phantom('rle_line_%d'    %  row,              r , temp  , sublime.LAYOUT_INLINE)
                         self.view.add_regions('rle_line_%d_%s' % (row, line_type), [r], '', '', sublime.HIDDEN)
 
 
@@ -695,33 +648,18 @@ class RawLineEditListener(sublime_plugin.EventListener):
             for line in crlf:
                 pt = view.text_point(line + 1, 0) - 1
                 region = sublime.Region(pt)
-                view.add_phantom(
-                    'rle_line_%d' % line,
-                    region,
-                    '%s<span>¤</span><span>¬</span>' % CSS,
-                    sublime.LAYOUT_INLINE
-                )
+                view.add_phantom('rle_line_%d'      % line,  region , span_cf,sublime.LAYOUT_INLINE)
                 view.add_regions('rle_line_%d_crlf' % line, [region], '', '', sublime.HIDDEN)
             for line in cr:
                 pt = view.text_point(line + 1, 0) - 1
                 region = sublime.Region(pt)
-                view.add_phantom(
-                    'rle_line_%d' % line,
-                    region,
-                    '%s<span>¤</span>' % CSS,
-                    sublime.LAYOUT_INLINE
-                )
-                view.add_regions('rle_line_%d_cr' % line, [region], '', '', sublime.HIDDEN)
+                view.add_phantom('rle_line_%d'      % line,  region , span_cr,sublime.LAYOUT_INLINE)
+                view.add_regions('rle_line_%d_cr'   % line, [region], '', '', sublime.HIDDEN)
             for line in lf:
                 pt = view.text_point(line + 1, 0) - 1
                 region = sublime.Region(pt)
-                view.add_phantom(
-                    'rle_line_%d' % line,
-                    region,
-                    '%s<span>¬</span>' % CSS,
-                    sublime.LAYOUT_INLINE
-                )
-                view.add_regions('rle_line_%d_lf' % line, [region], '', '', sublime.HIDDEN)
+                view.add_phantom('rle_line_%d'      % line,  region , span_lf,sublime.LAYOUT_INLINE)
+                view.add_regions('rle_line_%d_lf'   % line, [region], '', '', sublime.HIDDEN)
 
             view.set_scratch(True)
             view.set_read_only(True)
