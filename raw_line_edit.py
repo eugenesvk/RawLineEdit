@@ -24,9 +24,9 @@ except Exception:
 
             return False
 
-_f  = '¬' # ¤␍↩ ¬␤  ¤¬␍␤⏎  ⌤
-_c  = '¤'
-_cf = None # use combo of _c and _f instead of a custom char ''
+_s_lf  = '¬' # ¤␍↩ ¬␤  ¤¬␍␤⏎  ⌤
+_s_cr  = '¤'
+_s_crlf= None # use combo of _s_cr and _s_lf instead of a custom char ''
 CSS = """
 <style>
 span {
@@ -73,8 +73,8 @@ def process_lines(text):
         return '\n'
 
     text = RE_NEW_LINE.sub(repl, text)
-    is_mixed = ((len(lf)>0) + (len(cr)>0) + (len(crlf)>0)) > 1
-    return text, lf, cr, crlf, is_mixed
+    is_mix = ((len(lf)>0) + (len(cr)>0) + (len(crlf)>0)) > 1
+    return text, lf, cr, crlf, is_mix
 
 
 def strip_buffer_glyphs(view):
@@ -155,7 +155,7 @@ def get_cfg_css():
     C = sublime.load_settings("raw_line_edit.sublime-settings")
     id = "_T"
     css_dict = {'css':CSS}
-    for css_t in ['css','css_c','css_f','css_cf', 'css_c_mixed','css_f_mixed','css_cf_mixed']:
+    for css_t in ['css','css_cr','css_lf','css_crlf', 'css_cr_mix','css_lf_mix','css_crlf_mix']:
         cfg_css = C.get(css_t,None)
         if isinstance(cfg_css,list):
             css = '<style>\n'
@@ -324,19 +324,19 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
         Present the info in raw line view.
         """
         with codecs.open(file_name, "r", encoding) as f:
-            text, lf, cr, crlf, is_mixed = process_lines(f.read())
+            text, lf, cr, crlf, is_mix = process_lines(f.read())
             self.view.replace(edit, sublime.Region(0, self.view.size()), text)
             self.view.set_line_endings("Unix")
             settings = self.view.settings()
             settings.set("RawLineEdit", True)
             settings.set("RawLineEditSyntax", settings.get('syntax'))
             settings.set("RawLineEditFilename", file_name)
-            settings.set("RawLineMixed",is_mixed)
+            settings.set("RawLineMixed",is_mix)
             self.view.assign_syntax(settings.get('syntax'))
             self.view.set_scratch(True)
             self.view.set_read_only(True)
 
-            self.update_phantoms(crlf, cr, lf, is_mixed)
+            self.update_phantoms(crlf, cr, lf, is_mix)
 
     def read_buffer(self):
         """Read the unsaved buffer and replace with new line glyphs."""
@@ -359,17 +359,17 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
             self.view.set_read_only(False)
         settings = self.view.settings()
         self.view.settings().set("RawLineBuffer", self.view.line_endings())
-        text, lf, cr, crlf, is_mixed = process_lines(self.read_buffer())
+        text, lf, cr, crlf, is_mix = process_lines(self.read_buffer())
         self.view.replace(edit, sublime.Region(0, self.view.size()), text)
         self.view.set_line_endings("Unix")
         settings.set("RawLineEdit", True)
         settings.set("RawLineEditSyntax", self.view.settings().get('syntax'))
-        settings.set("RawLineMixed",is_mixed)
+        settings.set("RawLineMixed",is_mix)
         if file_name is not None:
             settings.set("RawLineEditFilename", file_name)
         self.view.set_scratch(True)
         self.view.set_read_only(True)
-        self.update_phantoms(crlf, cr, lf, is_mixed)
+        self.update_phantoms(crlf, cr, lf, is_mix)
 
     def disable_buffer_rle(self, edit):
         """Disable the raw line mode on an unsaved buffer."""
@@ -392,20 +392,20 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
         win.run_command("close_file")
         win.focus_view(new_view)
 
-    def update_phantoms(self, crlf, cr, lf, is_mixed):
+    def update_phantoms(self, crlf, cr, lf, is_mix):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
+        s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
         css_dict = get_cfg_css()
-        css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
-        css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
-        css_f  = css_dict.get('css_f_mixed'  if (is_mixed and 'css_f_mixed'  in css_dict) else 'css_f' ,css)
-        css_cf = css_dict.get('css_cf_mixed' if (is_mixed and 'css_cf_mixed' in css_dict) else 'css_cf',css)
+        css     = css_dict.get('css_mix'      if (is_mix and 'css_mix'      in css_dict) else 'css'     ,CSS)
+        css_cr  = css_dict.get('css_cr_mix'   if (is_mix and 'css_cr_mix'   in css_dict) else 'css_cr'  ,css)
+        css_lf  = css_dict.get('css_lf_mix'   if (is_mix and 'css_lf_mix'   in css_dict) else 'css_lf'  ,css)
+        css_crlf= css_dict.get('css_crlf_mix' if (is_mix and 'css_crlf_mix' in css_dict) else 'css_crlf',css)
 
-        span_cr = f'{css_c }<span>{sc }</span>'
-        span_lf = f'{css_f }<span>{sf }</span>'
-        span_cf = f'{css_cf}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{css_cf}<span>{sc }</span><span>{sf }</span>'
+        span_cr = f'{css_cr  }<span>{s_cr  }</span>'
+        span_lf = f'{css_lf  }<span>{s_lf  }</span>'
+        span_cf = f'{css_crlf}<span>{s_crlf}</span>' if isinstance(s_crlf,str) \
+            else  f'{css_crlf}<span>{s_cr  }</span><span>{s_lf  }</span>'
 
         for line in crlf:
             pt = self.view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
@@ -512,7 +512,7 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
         view.set_read_only(False)
 
         RawLinesEditReplaceCommand.region = sublime.Region(0, view.size())
-        RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mixed = process_lines(self.read_buffer())
+        RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mix = process_lines(self.read_buffer())
         view.run_command("raw_lines_edit_replace")
         view.sel().clear()
         settings = view.settings()
@@ -521,13 +521,13 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
         settings.set("RawLineEditSyntax", self.view.settings().get('syntax'))
         settings.set("RawLineEditPopup", True)
         settings.set("RawLineBuffer", self.view.line_endings())
-        settings.set("RawLineMixed",is_mixed)
+        settings.set("RawLineMixed",is_mix)
         if file_name is not None:
             settings.set("RawLineEditFilename", file_name)
         view.set_scratch(True)
         view.set_read_only(True)
 
-        self.update_phantoms(view, crlf, cr, lf, is_mixed)
+        self.update_phantoms(view, crlf, cr, lf, is_mix)
         self.view.window().run_command("show_panel", {"panel": "output.raw_line_edit_view"})
 
     def show_rle(self, file_name, encoding):
@@ -539,7 +539,7 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
             with codecs.open(file_name, "r", encoding) as f:
                 view.set_read_only(False)
                 RawLinesEditReplaceCommand.region = sublime.Region(0, view.size())
-                RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mixed = process_lines(f.read())
+                RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mix = process_lines(f.read())
                 view.run_command("raw_lines_edit_replace")
                 view.sel().clear()
                 view.assign_syntax(self.view.settings().get('syntax'))
@@ -547,11 +547,11 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
                 view.settings().set("RawLineEdit", True)
                 view.settings().set("RawLineEditFilename", file_name)
                 view.settings().set("RawLineEditPopup", True)
-                view.settings().set("RawLineMixed",is_mixed)
+                view.settings().set("RawLineMixed",is_mix)
                 view.set_scratch(True)
                 view.set_read_only(True)
 
-                self.update_phantoms(view, crlf, cr, lf, is_mixed)
+                self.update_phantoms(view, crlf, cr, lf, is_mix)
                 self.view.window().run_command("show_panel", {"panel": "output.raw_line_edit_view"})
         except Exception:
             self.view.window().run_command("hide_panel", {"panel": "output.raw_line_edit_view"})
@@ -560,17 +560,17 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
     def update_phantoms(self, view, crlf, cr, lf):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
+        s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
         css_dict = get_cfg_css()
-        css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
-        css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
-        css_f  = css_dict.get('css_f_mixed'  if (is_mixed and 'css_f_mixed'  in css_dict) else 'css_f' ,css)
-        css_cf = css_dict.get('css_cf_mixed' if (is_mixed and 'css_cf_mixed' in css_dict) else 'css_cf',css)
+        css     = css_dict.get('css_mix'      if (is_mix and 'css_mix'      in css_dict) else 'css'     ,CSS)
+        css_cr  = css_dict.get('css_cr_mix'   if (is_mix and 'css_cr_mix'   in css_dict) else 'css_cr'  ,css)
+        css_lf  = css_dict.get('css_lf_mix'   if (is_mix and 'css_lf_mix'   in css_dict) else 'css_lf'  ,css)
+        css_crlf= css_dict.get('css_crlf_mix' if (is_mix and 'css_crlf_mix' in css_dict) else 'css_crlf',css)
 
-        span_cr = f'{css_c }<span>{sc }</span>'
-        span_lf = f'{css_f }<span>{sf }</span>'
-        span_cf = f'{css_cf}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{css_cf}<span>{sc }</span><span>{sf }</span>'
+        span_cr = f'{css_cr  }<span>{s_cr  }</span>'
+        span_lf = f'{css_lf  }<span>{s_lf  }</span>'
+        span_cf = f'{css_crlf}<span>{s_crlf}</span>' if isinstance(s_crlf,str) \
+            else  f'{css_crlf}<span>{s_cr  }</span><span>{s_lf  }</span>'
 
         for line in crlf:
             pt = view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
@@ -600,18 +600,18 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, style="Unix"):
         """Insert text."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
-        is_mixed = self.view.settings().get("RawLineMixed",False)
+        s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
+        is_mix = self.view.settings().get("RawLineMixed",False)
         css_dict = get_cfg_css()
-        css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
-        css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
-        css_f  = css_dict.get('css_f_mixed'  if (is_mixed and 'css_f_mixed'  in css_dict) else 'css_f' ,css)
-        css_cf = css_dict.get('css_cf_mixed' if (is_mixed and 'css_cf_mixed' in css_dict) else 'css_cf',css)
+        css     = css_dict.get('css_mix'      if (is_mix and 'css_mix'      in css_dict) else 'css'     ,CSS)
+        css_cr  = css_dict.get('css_cr_mix'   if (is_mix and 'css_cr_mix'   in css_dict) else 'css_cr'  ,css)
+        css_lf  = css_dict.get('css_lf_mix'   if (is_mix and 'css_lf_mix'   in css_dict) else 'css_lf'  ,css)
+        css_crlf= css_dict.get('css_crlf_mix' if (is_mix and 'css_crlf_mix' in css_dict) else 'css_crlf',css)
 
-        span_cr = f'{css_c }<span>{sc }</span>'
-        span_lf = f'{css_f }<span>{sf }</span>'
-        span_cf = f'{css_cf}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{css_cf}<span>{sc }</span><span>{sf }</span>'
+        span_cr = f'{css_cr  }<span>{s_cr  }</span>'
+        span_lf = f'{css_lf  }<span>{s_lf  }</span>'
+        span_cf = f'{css_crlf}<span>{s_crlf}</span>' if isinstance(s_crlf,str) \
+            else  f'{css_crlf}<span>{s_cr  }</span><span>{s_lf  }</span>'
 
         for s in reversed(self.view.sel()):
             line_regions = self.view.lines(s)
@@ -677,24 +677,24 @@ class RawLineEditListener(sublime_plugin.EventListener):
 
             view.set_read_only(False)
             RawLinesEditReplaceCommand.region = sublime.Region(0, view.size())
-            RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mixed = process_lines(
+            RawLinesEditReplaceCommand.text, lf, cr, crlf, is_mix = process_lines(
                 view.substr(RawLinesEditReplaceCommand.region)
             )
-            view.settings().set("RawLineMixed",is_mixed)
+            view.settings().set("RawLineMixed",is_mix)
             view.run_command("raw_lines_edit_replace")
 
             C = sublime.load_settings("raw_line_edit.sublime-settings")
-            sc = C.get('cr_symbol',_c); sf = C.get('lf_symbol',_f); scf = C.get('crlf_symbol',_cf)
+            s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
             css_dict = get_cfg_css()
-            css    = css_dict.get('css_mixed'    if (is_mixed and 'css_mixed'    in css_dict) else 'css'   ,CSS)
-            css_c  = css_dict.get('css_c_mixed'  if (is_mixed and 'css_c_mixed'  in css_dict) else 'css_c' ,css)
-            css_f  = css_dict.get('css_f_mixed'  if (is_mixed and 'css_f_mixed'  in css_dict) else 'css_f' ,css)
-            css_cf = css_dict.get('css_cf_mixed' if (is_mixed and 'css_cf_mixed' in css_dict) else 'css_cf',css)
+            css     = css_dict.get('css_mix'      if (is_mix and 'css_mix'      in css_dict) else 'css'     ,CSS)
+            css_cr  = css_dict.get('css_cr_mix'   if (is_mix and 'css_cr_mix'   in css_dict) else 'css_cr'  ,css)
+            css_lf  = css_dict.get('css_lf_mix'   if (is_mix and 'css_lf_mix'   in css_dict) else 'css_lf'  ,css)
+            css_crlf= css_dict.get('css_crlf_mix' if (is_mix and 'css_crlf_mix' in css_dict) else 'css_crlf',css)
 
-            span_cr = f'{css_c }<span>{sc }</span>'
-            span_lf = f'{css_f }<span>{sf }</span>'
-            span_cf = f'{css_cf}<span>{scf}</span>' if isinstance(scf,str) \
-                else  f'{css_cf}<span>{sc }</span><span>{sf }</span>'
+            span_cr = f'{css_cr  }<span>{s_cr  }</span>'
+            span_lf = f'{css_lf  }<span>{s_lf  }</span>'
+            span_cf = f'{css_crlf}<span>{s_crlf}</span>' if isinstance(s_crlf,str) \
+                else  f'{css_crlf}<span>{s_cr  }</span><span>{s_lf  }</span>'
 
             for line in crlf:
                 pt = view.text_point(line + 1, 0) - 1
