@@ -372,11 +372,23 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
     def update_phantoms(self, crlf, cr, lf):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
-        span_cr = f'{CSS}<span>{sc }</span>'
-        span_lf = f'{CSS}<span>{sf }</span>'
-        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf); cfg_css = C.get('css',None)
+        css = CSS
+        if isinstance(cfg_css,list):
+            css = '<style>\n'
+            for d in cfg_css:
+                if not isinstance(d,dict): continue
+                if not "_T" in d: continue
+                css   += f"{d['_T']} {{\n"
+                for k,v in d.items():
+                  if   "_T" == k: continue
+                  css += f"{k}: {v};\n"
+                css   += "}}\n"
+            css += '\n</style>'
+        span_cr = f'{css}<span>{sc }</span>'
+        span_lf = f'{css}<span>{sf }</span>'
+        span_cf = f'{css}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{css}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
             pt = self.view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
@@ -529,11 +541,23 @@ class PopupRawLineEditCommand(sublime_plugin.TextCommand):
     def update_phantoms(self, view, crlf, cr, lf):
         """Update phantoms."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
-        span_cr = f'{CSS}<span>{sc }</span>'
-        span_lf = f'{CSS}<span>{sf }</span>'
-        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf); cfg_css = C.get('css',None)
+        css = CSS
+        if isinstance(cfg_css,list):
+            css = '<style>\n'
+            for d in cfg_css:
+                if not isinstance(d,dict): continue
+                if not "_T" in d: continue
+                css   += f"{d['_T']} {{\n"
+                for k,v in d.items():
+                  if   "_T" == k: continue
+                  css += f"{k}: {v};\n"
+                css   += "}}\n"
+            css += '\n</style>'
+        span_cr = f'{css}<span>{sc }</span>'
+        span_lf = f'{css}<span>{sf }</span>'
+        span_cf = f'{css}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{css}<span>{sc }</span><span>{sf }</span>'
 
         for line in crlf:
             pt = view.text_point(line + 1, 0) - 1; region = sublime.Region(pt)
@@ -563,11 +587,23 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, style="Unix"):
         """Insert text."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
-        span_cr = f'{CSS}<span>{sc }</span>'
-        span_lf = f'{CSS}<span>{sf }</span>'
-        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf); cfg_css = C.get('css',None)
+        css = CSS
+        if isinstance(cfg_css,list):
+            css = '<style>\n'
+            for d in cfg_css:
+                if not isinstance(d,dict): continue
+                if not "_T" in d: continue
+                css   += f"{d['_T']} {{\n"
+                for k,v in d.items():
+                  if   "_T" == k: continue
+                  css += f"{k}: {v};\n"
+                css   += "}}\n"
+            css += '\n</style>'
+        span_cr = f'{css}<span>{sc }</span>'
+        span_lf = f'{css}<span>{sf }</span>'
+        span_cf = f'{css}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{css}<span>{sc }</span><span>{sf }</span>'
 
         for s in reversed(self.view.sel()):
             line_regions = self.view.lines(s)
@@ -625,11 +661,23 @@ class RawLineEditListener(sublime_plugin.EventListener):
     def on_post_save(self, view):
         """Convert view back to raw line mode after save."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
-        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf)
-        span_cr = f'{CSS}<span>{sc }</span>'
-        span_lf = f'{CSS}<span>{sf }</span>'
-        span_cf = f'{CSS}<span>{scf}</span>' if isinstance(scf,str) \
-            else  f'{CSS}<span>{sc }</span><span>{sf }</span>'
+        sc = C.get('sc',_c); sf = C.get('sf',_f); scf = C.get('scf',_cf); cfg_css = C.get('css',None)
+        css = CSS
+        if isinstance(cfg_css,list):
+            css = '<style>\n'
+            for d in cfg_css:
+                if not isinstance(d,dict): continue
+                if not "_T" in d: continue
+                css   += f"{d['_T']} {{\n"
+                for k,v in d.items():
+                  if   "_T" == k: continue
+                  css += f"{k}: {v};\n"
+                css   += "}}\n"
+            css += '\n</style>'
+        span_cr = f'{css}<span>{sc }</span>'
+        span_lf = f'{css}<span>{sf }</span>'
+        span_cf = f'{css}<span>{scf}</span>' if isinstance(scf,str) \
+            else  f'{css}<span>{sc }</span><span>{sf }</span>'
 
         if view.settings().get("RawLineEdit", False) and not view.settings().get('RawLineEditPopup', False):
             file_name = view.file_name()
