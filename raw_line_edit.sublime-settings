@@ -8,5 +8,28 @@
     // In these cases the line endings will be normalized,
     // but you can edit them and save them back to disk.
     // Not sure how useful this is.
-    "operate_on_unsaved_buffers": false
+    "operate_on_unsaved_buffers": false,
+
+// Custom symbols for…
+// "sc":"¤"  ,//¤␍↩       …carriage return
+// "sf":"¬"  ,//¬␤        …line feed
+// "scf":null,//null ⏎⮒⌤  …Cr+Lf    uses SC SF if null
+
+// Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite
+// "css": [
+//   {"_T":"span", //_T stores the name of the span → "_T {}", the rest become "key: value;" lines
+//     "display"         	: "inline",
+//     "font-size"       	: "0.9rem",
+//     "font-weight"     	: "bold",
+//     "padding"         	: "0.05rem 0.25rem",
+//     "border-radius"   	: "0.25rem",
+//     "background-color"	: "var(--foreground)",
+//     "color"           	: "var(--background)",
+//     "border"          	: "1px solid var(--mdpopups-kbd-border)",
+//   },
+//   {"_T":"html.light span",
+//     "border":"1px solid color(var(--foreground) blend(white 80%))",},
+//   {"_T":"html.light span",
+//     "border":"1px solid color(var(--foreground) blend(black 80%))",},
+// ],
 }
