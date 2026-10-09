@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   **NEW**: add a status warning about mixed line ending file since those are corrupted by Sublime on save
+-   **NEW**: add user config to suppress status bar warning
 -   **NEW**: user-customizable newline symbol values and phantom style
 -   **NEW**: Updates for Python 3.14 on ST 4205+.
 -   **FIX**: destruction of the last line without a line ending: #30
