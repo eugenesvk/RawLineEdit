@@ -23,6 +23,7 @@ except Exception:
 _s_lf  = '¬' # ¤␍↩ ¬␤  ¤¬␍␤⏎  ⌤
 _s_cr  = '¤'
 _s_crlf= None # use combo of _s_cr and _s_lf instead of a custom char ''
+_warn_mix = True
 CSS = """
 <style>
 span {
@@ -261,6 +262,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
         """Read the file from disk converting actual lines to glyphs. Present the info in raw line view."""
         C = sublime.load_settings("raw_line_edit.sublime-settings")
         s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
+        warn_mix = C.get('warn_mix',_warn_mix);
         with codecs.open(file_name, "r", encoding) as f:
             text, lf, cr, crlf, is_mix = process_lines(f.read())
             self.view.replace(edit, sublime.Region(0, self.view.size()), text)
@@ -274,7 +276,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
             self.view.set_scratch  (True)
             self.view.set_read_only(True)
 
-            if is_mix:
+            if is_mix and warn_mix:
                 msg_status = '❗mixed line end'
                 if len(lf  ) > 0: msg_status += ' '+ s_lf
                 if len(cr  ) > 0: msg_status += ' '+ s_cr
