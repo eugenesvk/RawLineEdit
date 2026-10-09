@@ -528,6 +528,10 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
         span_cf = f'{css_crlf}<span>{s_crlf}</span>' if isinstance(s_crlf,str) \
             else  f'{css_crlf}<span>{s_cr  }</span><span>{s_lf  }</span>'
 
+        if   style == "Unix"   : span_t = span_lf; line_t = 'lf'
+        elif style == "Windows": span_t = span_cf; line_t = 'crlf'
+        else                   : span_t = span_cr; line_t = 'cr'
+
         for s in reversed(self.view.sel()):
             line_regions = self.view.lines(s)
             for region in line_regions:
@@ -540,14 +544,9 @@ class RawLineInsertCommand(sublime_plugin.TextCommand):
                     if r is not None:
                         self.view.erase_regions ('rle_line_%d_%s' % (row, line_type))
                         self.view.erase_phantoms('rle_line_%d'    %  row            )
-
-                        pt = self.view.text_point(row + 1, 0) - 1
-                        r = sublime.Region(pt)
-                        if   style == "Unix"   : temp = span_lf; line_type = 'lf'
-                        elif style == "Windows": temp = span_cf; line_type = 'crlf'
-                        else                   : temp = span_cr; line_type = 'cr'
-                        self.view.add_phantom('rle_line_%d'    %  row,              r , temp  , sublime.LAYOUT_INLINE)
-                        self.view.add_regions('rle_line_%d_%s' % (row, line_type), [r], '', '', sublime.HIDDEN)
+                        pt = self.view.text_point(row + 1, 0) - 1;  r = sublime.Region(pt)
+                        self.view.add_phantom   ('rle_line_%d'    %  row,              r ,span_t,sublime.LAYOUT_INLINE)
+                        self.view.add_regions   ('rle_line_%d_%s' % (row, line_t    ),[r],'', '',sublime.HIDDEN)
 
 
 class RawLinesEditReplaceCommand(sublime_plugin.TextCommand):
