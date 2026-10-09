@@ -15,6 +15,8 @@
 // "lf_symbol" :"¬"  ,//¬␤       …line feed
 // "crlf_symbol":null,//null ⏎⮒⌤ …Cr+Lf    uses "CR_symbol""LF_symbol" if null
 
+//"warn_mix":true,//T show status message on editing mixed line ending files since those are corrupted by Sublime
+
 // Custom CSS style for the symbols popups, see sublimetext.com/docs/minihtml.html. Conversion from JSON is primivite, supports only 1 level of nesting
 // can also use custom styles for each symbol:  "css_cr"  "css_lf"  "css_crlf" for carriage return, line feed, Cr+Lf respectively
 // and even     custom styles for mixed line-ending files, e.g., to highlight ␍Carriage Returns that Sublime Text silently corrupts on save by normalizing it
