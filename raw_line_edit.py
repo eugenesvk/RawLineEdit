@@ -198,6 +198,7 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
     """Toggle raw line edit mode."""
     def disable_rle(self, edit):
         """Disable raw line ending mode."""
+        self.view.erase_status('raw_line_edit')
         if self.view.is_dirty(): # Save raw line ending changes
             if sublime.ok_cancel_dialog("Raw Line Edit:\nFile has unsaved changes.  Save?","Save"): self.view.run_command("save")
 
@@ -258,6 +259,8 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
 
     def show_rle(self, edit, file_name, encoding):
         """Read the file from disk converting actual lines to glyphs. Present the info in raw line view."""
+        C = sublime.load_settings("raw_line_edit.sublime-settings")
+        s_cr = C.get('cr_symbol',_s_cr); s_lf = C.get('lf_symbol',_s_lf); s_crlf = C.get('crlf_symbol',_s_crlf)
         with codecs.open(file_name, "r", encoding) as f:
             text, lf, cr, crlf, is_mix = process_lines(f.read())
             self.view.replace(edit, sublime.Region(0, self.view.size()), text)
@@ -270,6 +273,13 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
             self.view.assign_syntax(settings.get('syntax'))
             self.view.set_scratch  (True)
             self.view.set_read_only(True)
+
+            if is_mix:
+                msg_status = '❗mixed line end'
+                if len(lf  ) > 0: msg_status += ' '+ s_lf
+                if len(cr  ) > 0: msg_status += ' '+ s_cr
+                if len(crlf) > 0: msg_status += ' '+ s_crlf
+                self.view.set_status('raw_line_edit', msg_status)
 
             self.update_phantoms(crlf, cr, lf, is_mix)
 
