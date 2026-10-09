@@ -272,54 +272,29 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
         """Enable raw line ending mode."""
 
         if self.view.is_dirty():
-            if convert_buffers():
-                msg = (
-                    "File has unsaved changes.  If you choose to 'continue' without a 'save', "
-                    "the view buffer will be parsed as the source.\n\nSave?"
-                )
-            else:
-                msg = (
-                    "File has unsaved changes.  If you choose to 'continue' without a 'save', "
-                    "changes will be discarded and the file will be parsed from disk.\n\nSave?"
-                )
+            if convert_buffers(): msg = ("File has unsaved changes.  If you choose to 'continue' without a 'save', the view buffer will be parsed as the source.\n\nSave?")
+            else                : msg = ("File has unsaved changes.  If you choose to 'continue' without a 'save', changes will be discarded and the file will be parsed from disk.\n\nSave?")
             value = sublime.yes_no_cancel_dialog(msg, "Save", "Continue")
-            if value == sublime.DIALOG_YES:
-                # Save the file
-                self.view.run_command("save")
-            elif value == sublime.DIALOG_NO:
-                # Convert the unsaved buffer
-                if convert_buffers():
-                    self.enable_buffer_rle(edit, file_name)
-                    return
+            if   value == sublime.DIALOG_YES: self.view.run_command("save") # Save the file
+            elif value == sublime.DIALOG_NO : # Convert the unsaved buffer
+                if convert_buffers(): self.enable_buffer_rle(edit, file_name); return
                 else:
-                    if file_name is None:
-                        error("File must exist on disk!")
-                        return
-                    else:
-                        notify("Changes discarded.")
-            else:
-                return
+                    if file_name is None: error ("File must exist on disk!"); return
+                    else                : notify("Changes discarded.")
+            else: return
 
         if file_name is None or not exists(file_name):
-            if convert_buffers():
-                self.enable_buffer_rle(edit)
-            else:
-                error("File must exist on disk!")
+            if convert_buffers(): self.enable_buffer_rle(edit)
+            else                : error("File must exist on disk!")
             return
 
         # Convert the file on disk to a raw line view
         encoding = get_encoding(self.view)
-        try:
-            self.show_rle(edit, file_name, encoding)
-        except Exception:
-            self.show_rle(edit, file_name, "utf-8")
+        try             : self.show_rle(edit, file_name, encoding)
+        except Exception: self.show_rle(edit, file_name, "utf-8" )
 
     def show_rle(self, edit, file_name, encoding):
-        """
-        Read the file from disk converting actual lines to glyphs.
-
-        Present the info in raw line view.
-        """
+        """Read the file from disk converting actual lines to glyphs. Present the info in raw line view."""
         with codecs.open(file_name, "r", encoding) as f:
             text, lf, cr, crlf, is_mix = process_lines(f.read())
             self.view.replace(edit, sublime.Region(0, self.view.size()), text)
@@ -419,16 +394,12 @@ class ToggleRawLineEditCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         """Toggle the raw line mode."""
-
         file_name = self.view.file_name()
-        settings = self.view.settings()
-
-        if (file_name is None or not exists(file_name)) and settings.get("RawLineEdit", False):
-            self.disable_buffer_rle(edit)
-        elif settings.get("RawLineEdit", False):
-            self.disable_rle(edit)
-        elif not settings.get("RawLineEdit", False):
-            self.enable_rle(edit, file_name)
+        settings  = self.view.settings()
+        if (file_name is None or not exists(file_name))\
+            and  settings.get("RawLineEdit",False): self.disable_buffer_rle(edit           )
+        elif     settings.get("RawLineEdit",False): self.disable_rle       (edit           )
+        elif not settings.get("RawLineEdit",False): self.enable_rle        (edit, file_name)
 
 
 class PopupRawLineEditCommand(sublime_plugin.TextCommand):
